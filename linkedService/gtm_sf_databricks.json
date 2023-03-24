@@ -1,0 +1,18 @@
+{
+	"name": "gtm_sf_databricks",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-7433700282707568.0.databricks.azure.cn",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourceGroups/ce2-cndat-rg-np-odp09/providers/Microsoft.Databricks/workspaces/ce2-cndat-dbr-np-odp07",
+			"existingClusterId": "0209-074441-pnq4q759"
+		},
+		"connectVia": {
+			"referenceName": "air-odp01",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

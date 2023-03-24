@@ -1,0 +1,12 @@
+{
+	"name": "sir-odp01",
+	"properties": {
+		"type": "SelfHosted",
+		"typeProperties": {
+			"linkedInfo": {
+				"resourceId": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourcegroups/ce2-cndat-rg-np-odp01/providers/Microsoft.DataFactory/factories/ce2-cndat-df-np-odp01/integrationruntimes/sir-odp01",
+				"authorizationType": "Rbac"
+			}
+		}
+	}
+}

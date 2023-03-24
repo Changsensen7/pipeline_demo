@@ -1,0 +1,46 @@
+{
+	"name": "flow_gtm_comm_data",
+	"properties": {
+		"activities": [
+			{
+				"name": "sync-biz-data-mysql-hive",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "sync-biz-data-mysql-hive",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "sync-dw1-data-hive-mysql-full",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "sync-biz-data-mysql-hive",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "sync-dw1-data-hive-mysql-full",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"folder": {
+			"name": "gtm/gtm_comm_data"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-03-17T10:02:24Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

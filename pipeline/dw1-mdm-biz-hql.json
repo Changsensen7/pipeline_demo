@@ -1,0 +1,339 @@
+{
+	"name": "dw1-mdm-biz-hql",
+	"properties": {
+		"activities": [
+			{
+				"name": "import-item-master-data-ld",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-biz-invoice-ld",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-biz-sellin-ld",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-biz-shipment-ld",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-fact-dw1-biz-location-store-sale-ld",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-sum-dw1-biz-location-warehouse-sale-ld",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-ld-biz-forecast",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-ld-biz-sellout-target",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "import-ld-biz-forecast",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-biz-inventory-ld",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-shell-data-check",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "import-biz-inventory-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-art-odp-data-check",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "run-spark-shell-data-check",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "import-biz-invoice-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "import-biz-sellin-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "import-biz-shipment-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "import-ld-biz-sellout-target",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "import-fact-dw1-biz-location-store-sale-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "import-sum-dw1-biz-location-warehouse-sale-ld",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"folder": {
+			"name": "gtm/gtm_ldpos"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-03-17T03:43:02Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

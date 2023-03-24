@@ -1,0 +1,10 @@
+{
+	"name": "pe-ri-adls",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourceGroups/ce2-cndat-rg-np-odp09/providers/Microsoft.Storage/storageAccounts/ce2cndatdlsnpodp07",
+		"groupId": "dfs",
+		"fqdns": [
+			"ce2cndatdlsnpodp07.dfs.core.chinacloudapi.cn"
+		]
+	}
+}

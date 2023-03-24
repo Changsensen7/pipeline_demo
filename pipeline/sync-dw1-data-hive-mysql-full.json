@@ -1,0 +1,405 @@
+{
+	"name": "sync-dw1-data-hive-mysql-full",
+	"properties": {
+		"activities": [
+			{
+				"name": "import-item-master-data-common",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/test"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "export-full-dws-dim-item-price",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-common",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/dw1_mdm_item_price"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dws_dim_item_price"
+						}
+					}
+				]
+			},
+			{
+				"name": "export-full-dws-dim-item-uom",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-common",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/dw1_mdm_item_uom"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dws_dim_item_uom"
+						}
+					}
+				]
+			},
+			{
+				"name": "export-full-fact-dw1-biz-batch-log",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-common",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/dw1_biz_batch_log"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "fact_dw1_biz_batch_log"
+						}
+					}
+				]
+			},
+			{
+				"name": "export-full-fact-dw1-mdm-brand",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-common",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/dw1_mdm_brand"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dws_dim_brand"
+						}
+					}
+				]
+			},
+			{
+				"name": "export-full-fact-dw1-mdm-channel",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-common",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/dw1_mdm_channel"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dws_dim_channel"
+						}
+					}
+				]
+			},
+			{
+				"name": "export-full-fact-dw1-mdm-item",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-item-master-data-common",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/dw1_mdm_item"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dws_dim_item"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "gtm/gtm_comm_data"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-03-16T06:17:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

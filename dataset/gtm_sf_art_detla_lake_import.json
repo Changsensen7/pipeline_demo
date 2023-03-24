@@ -1,0 +1,25 @@
+{
+	"name": "gtm_sf_art_detla_lake_import",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDatabricksDeltaLake1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"delta_table_name": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureDatabricksDeltaLakeDataset",
+		"typeProperties": {
+			"database": "gtmart",
+			"table": {
+				"value": "@dataset().delta_table_name",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

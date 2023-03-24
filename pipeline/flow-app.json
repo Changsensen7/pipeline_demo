@@ -1,0 +1,664 @@
+{
+	"name": "flow-app",
+	"properties": {
+		"activities": [
+			{
+				"name": "run-curl-ld-demand-post-process-by-user",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/DemandForecastProductionAppendByUser"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-curl-ld-up-replenish-strategy",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "run-curl-ld-demand-post-process-by-user",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/UpReplenishStrategyJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-scala-ld-input-store-item",
+				"type": "DatabricksSparkJar",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"mainClassName": "InputStoreItemTask",
+					"parameters": [
+						"CN30",
+						"@pipeline().parameters.batch_id",
+						"CN30_A006",
+						"@pipeline().parameters.brand_code"
+					],
+					"libraries": [
+						{
+							"jar": "dbfs:/hello.jar"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-scala-ld-input-store-new-launch-form",
+				"type": "DatabricksSparkJar",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"mainClassName": "InputStoreNewLaunchFormTask",
+					"parameters": [
+						"CN30",
+						"@pipeline().parameters.batch_id",
+						"CN30_A006",
+						"@pipeline().parameters.brand_code"
+					],
+					"libraries": [
+						{
+							"jar": "dbfs:/hello.jar"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-scala-ld-ld-replenish",
+				"type": "DatabricksSparkJar",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-input-store-item",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "run-spark-scala-ld-input-store-new-launch-form",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"mainClassName": "LdReplenishTask",
+					"parameters": [
+						"CN30",
+						"@pipeline().parameters.batch_id",
+						"CN30_A006",
+						"@pipeline().parameters.brand_code"
+					],
+					"libraries": [
+						{
+							"jar": "dbfs:/hello.jar"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-scala-ld-kpi-day",
+				"type": "DatabricksSparkJar",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-ld-replenish",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"mainClassName": "KpiDayTask",
+					"parameters": [
+						"CN30",
+						"@pipeline().parameters.business_day_start",
+						"@pipeline().parameters.business_day_end",
+						"CN30_A006"
+					],
+					"libraries": [
+						{
+							"jar": "dbfs:/hello.jar"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-scala-ld-kpi-week",
+				"type": "DatabricksSparkJar",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-ld-replenish",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"mainClassName": "KpiWeekTask",
+					"parameters": [
+						"CN30",
+						"@pipeline().parameters.business_day_start",
+						"@pipeline().parameters.business_day_end",
+						"CN30_A006"
+					],
+					"libraries": [
+						{
+							"jar": "dbfs:/hello.jar"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-scala-ld-item-osa-day",
+				"type": "DatabricksSparkJar",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-ld-replenish",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"mainClassName": "ItemOsaDayTask",
+					"parameters": [
+						"CN30",
+						"@pipeline().parameters.business_day_start",
+						"@pipeline().parameters.business_day_end",
+						"CN30_A006"
+					],
+					"libraries": [
+						{
+							"jar": "dbfs:/hello.jar"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-scala-ld-kpi-month",
+				"type": "DatabricksSparkJar",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-ld-replenish",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"mainClassName": "KpiMonthTask",
+					"parameters": [
+						"CN30",
+						"@pipeline().parameters.business_day_start",
+						"@pipeline().parameters.business_day_end",
+						"CN30_A006"
+					],
+					"libraries": [
+						{
+							"jar": "dbfs:/hello.jar"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-scala-ld-coverage-days",
+				"type": "DatabricksSparkJar",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-ld-replenish",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"mainClassName": "CoverageDaysTask",
+					"parameters": [
+						"CN30",
+						"@pipeline().parameters.business_day_start",
+						"@pipeline().parameters.business_day_end",
+						"CN30_A006"
+					],
+					"libraries": [
+						{
+							"jar": "dbfs:/hello.jar"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-curl-ld-dashboard-generate",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-kpi-day",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "run-spark-scala-ld-kpi-week",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "run-spark-scala-ld-item-osa-day",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "run-spark-scala-ld-kpi-month",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "run-spark-scala-ld-coverage-days",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/DashboardJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-curl-ld-forecast-accuracy-slice-data",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "run-curl-ld-dashboard-generate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/ForecastAccuracySliceDataJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-scala-ld-equation",
+				"type": "DatabricksSparkJar",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-ld-replenish",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"mainClassName": "EquationTask",
+					"parameters": [
+						"CN30",
+						"@pipeline().parameters.batch_id",
+						"CN30_A006"
+					],
+					"libraries": [
+						{
+							"jar": "dbfs:/hello.jar"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-spark-scala-ld-replenishment-store-integration",
+				"type": "DatabricksSparkJar",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-ld-replenish",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"mainClassName": "ReplenishmentStoreIntegrationTask",
+					"parameters": [
+						"CN30",
+						"@pipeline().parameters.batch_id",
+						"CN30_A006",
+						"@pipeline().parameters.brand_code"
+					],
+					"libraries": [
+						{
+							"jar": "dbfs:/hello.jar"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "export-full-fact-dw2-alg-replenishment-store-output-soq",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-replenishment-store-integration",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/test"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "fact-app-replenishment-store-output-integration",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "run-spark-scala-ld-replenishment-store-integration",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/test"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-curl-ld-replenishment-adjust",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "export-full-fact-dw2-alg-replenishment-store-output-soq",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "fact-app-replenishment-store-output-integration",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/StoreReplenishmentAdjustJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-curl-ld-first-allocation-input-run",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "run-curl-ld-replenishment-adjust",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/FirstAllocationInputRunJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-curl-ld-first-allocation-run",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "run-curl-ld-first-allocation-input-run",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/FirstAllocationRunJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"batch_id": {
+				"type": "string"
+			},
+			"brand_code": {
+				"type": "string"
+			},
+			"business_day_start": {
+				"type": "string"
+			},
+			"business_day_end": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "gtm/gtm_ldpos"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-03-17T03:45:37Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

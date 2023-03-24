@@ -1,0 +1,2155 @@
+{
+	"name": "sync-biz-data-mysql-hive",
+	"properties": {
+		"activities": [
+			{
+				"name": "import-create-batch-id",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/test"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "run-sqoop-mysql-create-partition",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "import-create-batch-id",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/test"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "start-sync-biz-data-mysql-hive",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "run-sqoop-mysql-create-partition",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/test"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-ldlgtm_dpt-dw1-biz-replenish-strategy",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "start-sync-biz-data-mysql-hive",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/test"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "import-ldlgtm_dpt-dw1-biz-store-attribute",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "start-sync-biz-data-mysql-hive",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_store_attribute"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_store_attribute"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm_dpt-dw1-udt-business-calendar",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "start-sync-biz-data-mysql-hive",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_udt_business_calendar"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_business_calendar"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm_dpt-dw1-udt-coverage-days-default",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "start-sync-biz-data-mysql-hive",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_udt_coverage_days_default"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_coverage_days_default"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm_dpt-dw1-udt-limited-edition",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "start-sync-biz-data-mysql-hive",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_udt_limited_edition"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_limited_edition"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm_dpt-dw1-udt-location-type",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm_dpt-dw1-biz-replenish-strategy",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_udt_location_type"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_location_type"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm_dpt-dw1-udt-pdpc",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm_dpt-dw1-biz-store-attribute",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_udt_pdpc"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_pdpc"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm_dpt-dw1-udt-promotion-plan",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm_dpt-dw1-udt-business-calendar",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_udt_promotion_plan"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_promotion_plan"
+						}
+					}
+				]
+			},
+			{
+				"name": "dw1-biz-location-warehouse-inventory-allocation",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm_dpt-dw1-udt-coverage-days-default",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_location_warehouse_inventory_allocation"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_location_warehouse_inventory_allocation"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-dw1-biz-warehouse-item",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm_dpt-dw1-udt-limited-edition",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_warehouse_item"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_warehouse_item"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-dw1-udt-ship-rdc-mapping",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm_dpt-dw1-udt-location-type",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_udt_ship_rdc_mapping"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_dim_ship_rdc_mapping"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-biz-event-plan",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm_dpt-dw1-udt-pdpc",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_event_plan"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_event_plan"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-biz-item-attribute",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm_dpt-dw1-udt-promotion-plan",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_item_attribute"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_item_attribute"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-biz-item-substitute",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "dw1-biz-location-warehouse-inventory-allocation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_item_substitute"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_item_substitute"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-biz-item-substitute-all",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-dw1-biz-warehouse-item",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_item_substitute_all"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_item_substitute_all"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-biz-location-network",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-dw1-udt-ship-rdc-mapping",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_location_network"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_location_network"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-biz-new-launch",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-full-dw1-biz-event-plan",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_new_launch"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_new_launch"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-biz-store-item",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-full-dw1-biz-item-attribute",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_store_item"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_dim_biz_store_item"
+						}
+					}
+				]
+			},
+			{
+				"name": "full-dw1-biz-target-brand-store-sell-out-day",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-full-dw1-biz-item-substitute",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_target_brand_store_sell_out_day"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_sellout_target_day"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-mdm-channel-item",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-full-dw1-biz-item-substitute-all",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_mdm_channel_item"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_dim_channel_item"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-mdm-item-substitute",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-full-dw1-biz-location-network",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_mdm_item_substitute"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_dim_item_substitute"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-mdm-warehouse",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-full-dw1-biz-new-launch",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_mdm_warehouse"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_dim_warehouse"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-arp-biz-top-down-date-item-location",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "full-dw1-biz-target-brand-store-sell-out-day",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "arp_biz_top_down_date_item_location"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_top_down_date_item_location"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-dw1-udt-bulk-sales-and-plan",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-full-dw1-biz-store-item",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_udt_bulk_sales_and_plan"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_udt_bulk_sales_and_plan"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-full-arp-biz-top-down-location-item",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-full-dw1-mdm-channel-item",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "arp_biz_top_down_location_item"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_arp_biz_top_down_location_item"
+						}
+					}
+				]
+			},
+			{
+				"name": "sqoop-import-dw1-biz-replenish-strategy-jd",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-full-dw1-mdm-item-substitute",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw1_biz_replenish_strategy"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/ods_mysql_biz_replenish_strategy_jd"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm-dpt-dw1-udt-special-stock-plan",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "start-sync-biz-data-mysql-hive",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "test"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/test"
+						}
+					}
+				]
+			},
+			{
+				"name": "dpt-dw1-biz-store-warehouse-calendar-setting",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm-dpt-dw1-udt-special-stock-plan",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "test"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/test"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm-dpt-dw1-biz-warehouse-calendar",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "dpt-dw1-biz-store-warehouse-calendar-setting",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "test"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/test"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm-dpt-dw1-biz-warehouse-calendar-no-ship",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm-dpt-dw1-biz-warehouse-calendar",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "test"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/test"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm-dpt-dw2-output-allocation-java",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm-dpt-dw1-biz-warehouse-calendar-no-ship",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "test"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/test"
+						}
+					}
+				]
+			},
+			{
+				"name": "import-ldlgtm-dpt-app-replenishment-store-output-adjust",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm-dpt-dw2-output-allocation-java",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "test"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/test"
+						}
+					}
+				]
+			},
+			{
+				"name": "biz-location-warehouse-inventory-allocation-view",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "import-ldlgtm-dpt-app-replenishment-store-output-adjust",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "test"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_import",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "import/test"
+						}
+					}
+				]
+			},
+			{
+				"name": "end-sync-biz-data-mysql-hive",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "sqoop-import-dw1-biz-replenish-strategy-jd",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "sqoop-import-full-dw1-mdm-warehouse",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "sqoop-import-full-arp-biz-top-down-date-item-location",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "sqoop-import-full-dw1-udt-bulk-sales-and-plan",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "sqoop-import-full-arp-biz-top-down-location-item",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "biz-location-warehouse-inventory-allocation-view",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "css"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"folder": {
+			"name": "gtm/gtm_comm_data"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-03-16T06:17:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

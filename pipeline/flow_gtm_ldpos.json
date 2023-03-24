@@ -1,0 +1,86 @@
+{
+	"name": "flow_gtm_ldpos",
+	"properties": {
+		"activities": [
+			{
+				"name": "dw1-mdm-biz-hql",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "dw1-mdm-biz-hql",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "sync-dw1-data-hive-mysql",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "dw1-mdm-biz-hql",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "sync-dw1-data-hive-mysql",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "flow-app",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "sync-dw1-data-hive-mysql",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "flow-app",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "flow-export-mysql",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "flow-app",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "flow-export-mysql",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"folder": {
+			"name": "gtm/gtm_ldpos"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-03-17T10:02:05Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

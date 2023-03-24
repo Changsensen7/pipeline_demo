@@ -1,0 +1,16 @@
+{
+	"name": "gtm_sf_dst_mysql",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureMySql",
+		"typeProperties": {
+			"connectionString": "server=cncorpazpregtmdb01.mysql.database.chinacloudapi.cn;port=3306;database=scmw_loreal;uid=gtmapp@cncorpazpregtmdb01;sslmode=1;usesystemtruststore=0",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDFGNzczRjc1LURGNEYtNEE5Qi1CRDAxLTM2RkMzNDI1RjdBMl9kN2E1MzIwZC02MTQwLTQ0YjQtODFhZC0zODIzYjU3NGY1OWIiDQp9"
+		},
+		"connectVia": {
+			"referenceName": "air-odp01",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

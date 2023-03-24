@@ -1,0 +1,461 @@
+{
+	"name": "flow-export-mysql",
+	"properties": {
+		"activities": [
+			{
+				"name": "export-full-alg-location-item-order-progress",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/ads_app_alg_location_item_order_progress"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw2_alg_location_item_order_progress"
+						}
+					}
+				]
+			},
+			{
+				"name": "export-full-fact-dw2-alg-location-item-kpi-day",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/ads_app_alg_location_item_kpi_day"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw2_alg_location_item_kpi_day"
+						}
+					}
+				]
+			},
+			{
+				"name": "export-full-fact-dw2-alg-location-item-kpi-week",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/ads_app_alg_location_item_kpi_week"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw2_alg_location_item_kpi_week"
+						}
+					}
+				]
+			},
+			{
+				"name": "export-full-fact-dw2-alg-location-item-kpi-month",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/ads_app_alg_location_item_kpi_month"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw2_alg_location_item_kpi_month"
+						}
+					}
+				]
+			},
+			{
+				"name": "export-full-dws-algo-common-dim-type-day",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/ads_app_alg_common_dim_type_day"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw2_alg_common_dim_type_day"
+						}
+					}
+				]
+			},
+			{
+				"name": "export-full-fact-dw2-alg-item-osa-day",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/ads_app_alg_item_osa_day"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw2_alg_item_osa_day"
+						}
+					}
+				]
+			},
+			{
+				"name": "fact-dw2-alg-replenishment-store-output-equation",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "gtm_sf_art_parquet_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_path": "export/ads_app_alg_replenishment_store_output_equation"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "gtm_sf_art_mysql_export",
+						"type": "DatasetReference",
+						"parameters": {
+							"mysql_table_name": "dw2_alg_replenishment_store_output_equation"
+						}
+					}
+				]
+			},
+			{
+				"name": "run-curl-ld-cache-update-async",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "export-full-alg-location-item-order-progress",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "export-full-fact-dw2-alg-location-item-kpi-day",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "export-full-fact-dw2-alg-location-item-kpi-week",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "export-full-fact-dw2-alg-location-item-kpi-month",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "export-full-dws-algo-common-dim-type-day",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "export-full-fact-dw2-alg-item-osa-day",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "fact-dw2-alg-replenishment-store-output-equation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/CacheUpdateJob"
+				},
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_databricks",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"folder": {
+			"name": "gtm/gtm_ldpos"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-03-17T03:47:48Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

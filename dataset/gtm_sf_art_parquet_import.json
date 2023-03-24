@@ -1,0 +1,29 @@
+{
+	"name": "gtm_sf_art_parquet_import",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "gtm_sf_parquet",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"file_path": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().file_path",
+					"type": "Expression"
+				},
+				"fileSystem": "gtmart"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

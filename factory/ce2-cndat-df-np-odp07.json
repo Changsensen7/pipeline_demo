@@ -1,0 +1,22 @@
+{
+	"name": "ce2-cndat-df-np-odp07",
+	"properties": {
+		"encryption": {
+			"vaultBaseUrl": "https://ce2-cndat-kv-np-odp02.vault.azure.cn",
+			"keyName": "ce2-cndat-df-np-odp07-encryption-key",
+			"keyVersion": "b22b74874a1548fdba8b318c0a90f8ab"
+		}
+	},
+	"location": "chinaeast2",
+	"identity": {
+		"type": "SystemAssigned,UserAssigned",
+		"principalId": "526b2951-8ff5-4e43-8462-bda8e4842f00",
+		"tenantId": "1338e9e4-3189-42f4-9a96-b67c3549f5c5",
+		"userAssignedIdentities": {
+			"/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourcegroups/ce2-cndat-rg-np-odp09/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ce2-cndat-df-np-odp07-managed-identity": {
+				"clientId": "5124b661-27c5-44d2-a533-2a02e5722cd5",
+				"principalId": "d81aaa36-82d1-42c4-b7bd-505d222512ef"
+			}
+		}
+	}
+}
