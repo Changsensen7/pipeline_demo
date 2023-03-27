@@ -1,0 +1,58 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "ce2-cndat-df-np-odp07"
+		},
+		"AzureDatabricksDeltaLake1_accessToken": {
+			"value": ""
+		},
+		"gtm_sf_art_mysql_connectionString": {
+			"value": ""
+		},
+		"gtm_sf_dst_mysql_connectionString": {
+			"value": ""
+		},
+		"gtm_sf_sdt_mysql_connectionString": {
+			"value": ""
+		},
+		"gtm_sf_databricks_properties_typeProperties_existingClusterId": {
+			"value": "0209-074441-pnq4q759"
+		},
+		"gtm_sf_parquet_properties_typeProperties_url": {
+			"value": "https://ce2cndatdlsnpodp07.dfs.core.chinacloudapi.cn/"
+		},
+		"sir-odp01_properties_typeProperties_linkedInfo_resourceId": {
+			"value": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourcegroups/ce2-cndat-rg-np-odp01/providers/Microsoft.DataFactory/factories/ce2-cndat-df-np-odp01/integrationruntimes/sir-odp01"
+		},
+		"pe-core-adls_properties_privateLinkResourceId": {
+			"value": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourceGroups/ce2-cndat-rg-np-odp01/providers/Microsoft.Storage/storageAccounts/ce2cndatdlsnpodp01"
+		},
+		"pe-core-adls_properties_groupId": {
+			"value": "dfs"
+		},
+		"pe-core-adls_properties_fqdns": {
+			"value": [
+				"ce2cndatdlsnpodp01.dfs.core.chinacloudapi.cn"
+			]
+		},
+		"pe-ri-adls_properties_privateLinkResourceId": {
+			"value": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourceGroups/ce2-cndat-rg-np-odp09/providers/Microsoft.Storage/storageAccounts/ce2cndatdlsnpodp07"
+		},
+		"pe-ri-adls_properties_groupId": {
+			"value": "dfs"
+		},
+		"pe-ri-adls_properties_fqdns": {
+			"value": [
+				"ce2cndatdlsnpodp07.dfs.core.chinacloudapi.cn"
+			]
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

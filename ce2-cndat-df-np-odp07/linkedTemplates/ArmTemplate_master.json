@@ -1,0 +1,157 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "数据工厂名称",
+			"defaultValue": "ce2-cndat-df-np-odp07"
+		},
+		"AzureDatabricksDeltaLake1_accessToken": {
+			"type": "secureString",
+			"metadata": "“AzureDatabricksDeltaLake1”的“accessToken”的安全字符串"
+		},
+		"gtm_sf_art_mysql_connectionString": {
+			"type": "secureString",
+			"metadata": "“gtm_sf_art_mysql”的“connectionString”的安全字符串"
+		},
+		"gtm_sf_dst_mysql_connectionString": {
+			"type": "secureString",
+			"metadata": "“gtm_sf_dst_mysql”的“connectionString”的安全字符串"
+		},
+		"gtm_sf_sdt_mysql_connectionString": {
+			"type": "secureString",
+			"metadata": "“gtm_sf_sdt_mysql”的“connectionString”的安全字符串"
+		},
+		"gtm_sf_databricks_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0209-074441-pnq4q759"
+		},
+		"gtm_sf_parquet_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ce2cndatdlsnpodp07.dfs.core.chinacloudapi.cn/"
+		},
+		"sir-odp01_properties_typeProperties_linkedInfo_resourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourcegroups/ce2-cndat-rg-np-odp01/providers/Microsoft.DataFactory/factories/ce2-cndat-df-np-odp01/integrationruntimes/sir-odp01"
+		},
+		"pe-core-adls_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourceGroups/ce2-cndat-rg-np-odp01/providers/Microsoft.Storage/storageAccounts/ce2cndatdlsnpodp01"
+		},
+		"pe-core-adls_properties_groupId": {
+			"type": "string",
+			"defaultValue": "dfs"
+		},
+		"pe-core-adls_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"ce2cndatdlsnpodp01.dfs.core.chinacloudapi.cn"
+			]
+		},
+		"pe-ri-adls_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourceGroups/ce2-cndat-rg-np-odp09/providers/Microsoft.Storage/storageAccounts/ce2cndatdlsnpodp07"
+		},
+		"pe-ri-adls_properties_groupId": {
+			"type": "string",
+			"defaultValue": "dfs"
+		},
+		"pe-ri-adls_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"ce2cndatdlsnpodp07.dfs.core.chinacloudapi.cn"
+			]
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "包含链接 ARM 模板的存储帐户的 URI"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "包含链接 ARM 模板的存储帐户的 SAS 令牌"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "ce2-cndat-df-np-odp07_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"AzureDatabricksDeltaLake1_accessToken": {
+						"value": "[parameters('AzureDatabricksDeltaLake1_accessToken')]"
+					},
+					"gtm_sf_art_mysql_connectionString": {
+						"value": "[parameters('gtm_sf_art_mysql_connectionString')]"
+					},
+					"gtm_sf_dst_mysql_connectionString": {
+						"value": "[parameters('gtm_sf_dst_mysql_connectionString')]"
+					},
+					"gtm_sf_sdt_mysql_connectionString": {
+						"value": "[parameters('gtm_sf_sdt_mysql_connectionString')]"
+					},
+					"sir-odp01_properties_typeProperties_linkedInfo_resourceId": {
+						"value": "[parameters('sir-odp01_properties_typeProperties_linkedInfo_resourceId')]"
+					},
+					"pe-core-adls_properties_privateLinkResourceId": {
+						"value": "[parameters('pe-core-adls_properties_privateLinkResourceId')]"
+					},
+					"pe-core-adls_properties_groupId": {
+						"value": "[parameters('pe-core-adls_properties_groupId')]"
+					},
+					"pe-core-adls_properties_fqdns": {
+						"value": "[parameters('pe-core-adls_properties_fqdns')]"
+					},
+					"pe-ri-adls_properties_privateLinkResourceId": {
+						"value": "[parameters('pe-ri-adls_properties_privateLinkResourceId')]"
+					},
+					"pe-ri-adls_properties_groupId": {
+						"value": "[parameters('pe-ri-adls_properties_groupId')]"
+					},
+					"pe-ri-adls_properties_fqdns": {
+						"value": "[parameters('pe-ri-adls_properties_fqdns')]"
+					},
+					"gtm_sf_databricks_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('gtm_sf_databricks_properties_typeProperties_existingClusterId')]"
+					},
+					"gtm_sf_parquet_properties_typeProperties_url": {
+						"value": "[parameters('gtm_sf_parquet_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "ce2-cndat-df-np-odp07_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'ce2-cndat-df-np-odp07_ArmTemplate_0')]"
+			]
+		}
+	]
+}

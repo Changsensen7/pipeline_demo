@@ -1,0 +1,5970 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "数据工厂名称",
+			"defaultValue": "ce2-cndat-df-np-odp07"
+		},
+		"AzureDatabricksDeltaLake1_accessToken": {
+			"type": "secureString",
+			"metadata": "“AzureDatabricksDeltaLake1”的“accessToken”的安全字符串"
+		},
+		"gtm_sf_art_mysql_connectionString": {
+			"type": "secureString",
+			"metadata": "“gtm_sf_art_mysql”的“connectionString”的安全字符串"
+		},
+		"gtm_sf_dst_mysql_connectionString": {
+			"type": "secureString",
+			"metadata": "“gtm_sf_dst_mysql”的“connectionString”的安全字符串"
+		},
+		"gtm_sf_sdt_mysql_connectionString": {
+			"type": "secureString",
+			"metadata": "“gtm_sf_sdt_mysql”的“connectionString”的安全字符串"
+		},
+		"gtm_sf_databricks_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0209-074441-pnq4q759"
+		},
+		"gtm_sf_parquet_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ce2cndatdlsnpodp07.dfs.core.chinacloudapi.cn/"
+		},
+		"sir-odp01_properties_typeProperties_linkedInfo_resourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourcegroups/ce2-cndat-rg-np-odp01/providers/Microsoft.DataFactory/factories/ce2-cndat-df-np-odp01/integrationruntimes/sir-odp01"
+		},
+		"pe-core-adls_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourceGroups/ce2-cndat-rg-np-odp01/providers/Microsoft.Storage/storageAccounts/ce2cndatdlsnpodp01"
+		},
+		"pe-core-adls_properties_groupId": {
+			"type": "string",
+			"defaultValue": "dfs"
+		},
+		"pe-core-adls_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"ce2cndatdlsnpodp01.dfs.core.chinacloudapi.cn"
+			]
+		},
+		"pe-ri-adls_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourceGroups/ce2-cndat-rg-np-odp09/providers/Microsoft.Storage/storageAccounts/ce2cndatdlsnpodp07"
+		},
+		"pe-ri-adls_properties_groupId": {
+			"type": "string",
+			"defaultValue": "dfs"
+		},
+		"pe-ri-adls_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"ce2cndatdlsnpodp07.dfs.core.chinacloudapi.cn"
+			]
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/dw1-mdm-biz-hql')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "import-item-master-data-ld",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-biz-invoice-ld",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-biz-sellin-ld",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-biz-shipment-ld",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-fact-dw1-biz-location-store-sale-ld",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-sum-dw1-biz-location-warehouse-sale-ld",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-ld-biz-forecast",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-ld-biz-sellout-target",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "import-ld-biz-forecast",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-biz-inventory-ld",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-shell-data-check",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "import-biz-inventory-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-art-odp-data-check",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "run-spark-shell-data-check",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "import-biz-invoice-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "import-biz-sellin-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "import-biz-shipment-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "import-ld-biz-sellout-target",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "import-fact-dw1-biz-location-store-sale-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "import-sum-dw1-biz-location-warehouse-sale-ld",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "gtm/gtm_ldpos"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-03-17T03:43:02Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_databricks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/flow-app')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "run-curl-ld-demand-post-process-by-user",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/DemandForecastProductionAppendByUser"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-curl-ld-up-replenish-strategy",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "run-curl-ld-demand-post-process-by-user",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-scala-ld-input-store-item",
+						"type": "DatabricksSparkJar",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"mainClassName": "InputStoreItemTask",
+							"parameters": [
+								"CN30",
+								"@pipeline().parameters.batch_id",
+								"CN30_A006",
+								"@pipeline().parameters.brand_code"
+							],
+							"libraries": [
+								{
+									"jar": "dbfs:/hello.jar"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-scala-ld-input-store-new-launch-form",
+						"type": "DatabricksSparkJar",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"mainClassName": "InputStoreNewLaunchFormTask",
+							"parameters": [
+								"CN30",
+								"@pipeline().parameters.batch_id",
+								"CN30_A006",
+								"@pipeline().parameters.brand_code"
+							],
+							"libraries": [
+								{
+									"jar": "dbfs:/hello.jar"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-scala-ld-ld-replenish",
+						"type": "DatabricksSparkJar",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-input-store-item",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "run-spark-scala-ld-input-store-new-launch-form",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"mainClassName": "LdReplenishTask",
+							"parameters": [
+								"CN30",
+								"@pipeline().parameters.batch_id",
+								"CN30_A006",
+								"@pipeline().parameters.brand_code"
+							],
+							"libraries": [
+								{
+									"jar": "dbfs:/hello.jar"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-scala-ld-kpi-day",
+						"type": "DatabricksSparkJar",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-ld-replenish",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"mainClassName": "KpiDayTask",
+							"parameters": [
+								"CN30",
+								"@pipeline().parameters.business_day_start",
+								"@pipeline().parameters.business_day_end",
+								"CN30_A006"
+							],
+							"libraries": [
+								{
+									"jar": "dbfs:/hello.jar"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-scala-ld-kpi-week",
+						"type": "DatabricksSparkJar",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-ld-replenish",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"mainClassName": "KpiWeekTask",
+							"parameters": [
+								"CN30",
+								"@pipeline().parameters.business_day_start",
+								"@pipeline().parameters.business_day_end",
+								"CN30_A006"
+							],
+							"libraries": [
+								{
+									"jar": "dbfs:/hello.jar"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-scala-ld-item-osa-day",
+						"type": "DatabricksSparkJar",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-ld-replenish",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"mainClassName": "ItemOsaDayTask",
+							"parameters": [
+								"CN30",
+								"@pipeline().parameters.business_day_start",
+								"@pipeline().parameters.business_day_end",
+								"CN30_A006"
+							],
+							"libraries": [
+								{
+									"jar": "dbfs:/hello.jar"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-scala-ld-kpi-month",
+						"type": "DatabricksSparkJar",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-ld-replenish",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"mainClassName": "KpiMonthTask",
+							"parameters": [
+								"CN30",
+								"@pipeline().parameters.business_day_start",
+								"@pipeline().parameters.business_day_end",
+								"CN30_A006"
+							],
+							"libraries": [
+								{
+									"jar": "dbfs:/hello.jar"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-scala-ld-coverage-days",
+						"type": "DatabricksSparkJar",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-ld-replenish",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"mainClassName": "CoverageDaysTask",
+							"parameters": [
+								"CN30",
+								"@pipeline().parameters.business_day_start",
+								"@pipeline().parameters.business_day_end",
+								"CN30_A006"
+							],
+							"libraries": [
+								{
+									"jar": "dbfs:/hello.jar"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-curl-ld-dashboard-generate",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-kpi-day",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "run-spark-scala-ld-kpi-week",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "run-spark-scala-ld-item-osa-day",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "run-spark-scala-ld-kpi-month",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "run-spark-scala-ld-coverage-days",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/DashboardJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-curl-ld-forecast-accuracy-slice-data",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "run-curl-ld-dashboard-generate",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/ForecastAccuracySliceDataJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-scala-ld-equation",
+						"type": "DatabricksSparkJar",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-ld-replenish",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"mainClassName": "EquationTask",
+							"parameters": [
+								"CN30",
+								"@pipeline().parameters.batch_id",
+								"CN30_A006"
+							],
+							"libraries": [
+								{
+									"jar": "dbfs:/hello.jar"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-spark-scala-ld-replenishment-store-integration",
+						"type": "DatabricksSparkJar",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-ld-replenish",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"mainClassName": "ReplenishmentStoreIntegrationTask",
+							"parameters": [
+								"CN30",
+								"@pipeline().parameters.batch_id",
+								"CN30_A006",
+								"@pipeline().parameters.brand_code"
+							],
+							"libraries": [
+								{
+									"jar": "dbfs:/hello.jar"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "export-full-fact-dw2-alg-replenishment-store-output-soq",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-replenishment-store-integration",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "fact-app-replenishment-store-output-integration",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "run-spark-scala-ld-replenishment-store-integration",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-curl-ld-replenishment-adjust",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "export-full-fact-dw2-alg-replenishment-store-output-soq",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "fact-app-replenishment-store-output-integration",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/StoreReplenishmentAdjustJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-curl-ld-first-allocation-input-run",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "run-curl-ld-replenishment-adjust",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/FirstAllocationInputRunJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-curl-ld-first-allocation-run",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "run-curl-ld-first-allocation-input-run",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/FirstAllocationRunJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"batch_id": {
+						"type": "string"
+					},
+					"brand_code": {
+						"type": "string"
+					},
+					"business_day_start": {
+						"type": "string"
+					},
+					"business_day_end": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "gtm/gtm_ldpos"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-03-17T03:45:37Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_databricks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/flow-export-mysql')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "export-full-alg-location-item-order-progress",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/ads_app_alg_location_item_order_progress"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw2_alg_location_item_order_progress"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw2-alg-location-item-kpi-day",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/ads_app_alg_location_item_kpi_day"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw2_alg_location_item_kpi_day"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw2-alg-location-item-kpi-week",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/ads_app_alg_location_item_kpi_week"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw2_alg_location_item_kpi_week"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw2-alg-location-item-kpi-month",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/ads_app_alg_location_item_kpi_month"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw2_alg_location_item_kpi_month"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-dws-algo-common-dim-type-day",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/ads_app_alg_common_dim_type_day"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw2_alg_common_dim_type_day"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw2-alg-item-osa-day",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/ads_app_alg_item_osa_day"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw2_alg_item_osa_day"
+								}
+							}
+						]
+					},
+					{
+						"name": "fact-dw2-alg-replenishment-store-output-equation",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/ads_app_alg_replenishment_store_output_equation"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw2_alg_replenishment_store_output_equation"
+								}
+							}
+						]
+					},
+					{
+						"name": "run-curl-ld-cache-update-async",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "export-full-alg-location-item-order-progress",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "export-full-fact-dw2-alg-location-item-kpi-day",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "export-full-fact-dw2-alg-location-item-kpi-week",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "export-full-fact-dw2-alg-location-item-kpi-month",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "export-full-dws-algo-common-dim-type-day",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "export-full-fact-dw2-alg-item-osa-day",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "fact-dw2-alg-replenishment-store-output-equation",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Scala/src/activity/CacheUpdateJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "gtm/gtm_ldpos"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-03-17T03:47:48Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/gtm_sf_art_parquet_export')]",
+				"[concat(variables('factoryId'), '/datasets/gtm_sf_art_mysql_export')]",
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_databricks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/flow_gtm_comm_data')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "sync-biz-data-mysql-hive",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "sync-biz-data-mysql-hive",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "sync-dw1-data-hive-mysql-full",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "sync-biz-data-mysql-hive",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "sync-dw1-data-hive-mysql-full",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "gtm/gtm_comm_data"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-03-17T10:02:24Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/sync-biz-data-mysql-hive')]",
+				"[concat(variables('factoryId'), '/pipelines/sync-dw1-data-hive-mysql-full')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/flow_gtm_ldpos')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dw1-mdm-biz-hql",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "dw1-mdm-biz-hql",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "sync-dw1-data-hive-mysql",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "dw1-mdm-biz-hql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "sync-dw1-data-hive-mysql",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "flow-app",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "flow-app",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "flow-export-mysql",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "flow-app",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "flow-export-mysql",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "gtm/gtm_ldpos"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-03-17T10:02:05Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/dw1-mdm-biz-hql')]",
+				"[concat(variables('factoryId'), '/pipelines/sync-dw1-data-hive-mysql')]",
+				"[concat(variables('factoryId'), '/pipelines/flow-app')]",
+				"[concat(variables('factoryId'), '/pipelines/flow-export-mysql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "test",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "css"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_databricks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sync-biz-data-mysql-hive')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "import-create-batch-id",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "run-sqoop-mysql-create-partition",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "import-create-batch-id",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "start-sync-biz-data-mysql-hive",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "run-sqoop-mysql-create-partition",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-ldlgtm_dpt-dw1-biz-replenish-strategy",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "start-sync-biz-data-mysql-hive",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "import-ldlgtm_dpt-dw1-biz-store-attribute",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-biz-data-mysql-hive",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_store_attribute"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_store_attribute"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm_dpt-dw1-udt-business-calendar",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-biz-data-mysql-hive",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_udt_business_calendar"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_business_calendar"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm_dpt-dw1-udt-coverage-days-default",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-biz-data-mysql-hive",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_udt_coverage_days_default"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_coverage_days_default"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm_dpt-dw1-udt-limited-edition",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-biz-data-mysql-hive",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_udt_limited_edition"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_limited_edition"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm_dpt-dw1-udt-location-type",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm_dpt-dw1-biz-replenish-strategy",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_udt_location_type"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_location_type"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm_dpt-dw1-udt-pdpc",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm_dpt-dw1-biz-store-attribute",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_udt_pdpc"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_pdpc"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm_dpt-dw1-udt-promotion-plan",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm_dpt-dw1-udt-business-calendar",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_udt_promotion_plan"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_promotion_plan"
+								}
+							}
+						]
+					},
+					{
+						"name": "dw1-biz-location-warehouse-inventory-allocation",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm_dpt-dw1-udt-coverage-days-default",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_location_warehouse_inventory_allocation"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_location_warehouse_inventory_allocation"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-dw1-biz-warehouse-item",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm_dpt-dw1-udt-limited-edition",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_warehouse_item"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_warehouse_item"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-dw1-udt-ship-rdc-mapping",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm_dpt-dw1-udt-location-type",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_udt_ship_rdc_mapping"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_dim_ship_rdc_mapping"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-biz-event-plan",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm_dpt-dw1-udt-pdpc",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_event_plan"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_event_plan"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-biz-item-attribute",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm_dpt-dw1-udt-promotion-plan",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_item_attribute"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_item_attribute"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-biz-item-substitute",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "dw1-biz-location-warehouse-inventory-allocation",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_item_substitute"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_item_substitute"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-biz-item-substitute-all",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-dw1-biz-warehouse-item",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_item_substitute_all"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_item_substitute_all"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-biz-location-network",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-dw1-udt-ship-rdc-mapping",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_location_network"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_location_network"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-biz-new-launch",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-full-dw1-biz-event-plan",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_new_launch"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_new_launch"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-biz-store-item",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-full-dw1-biz-item-attribute",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_store_item"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_dim_biz_store_item"
+								}
+							}
+						]
+					},
+					{
+						"name": "full-dw1-biz-target-brand-store-sell-out-day",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-full-dw1-biz-item-substitute",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_target_brand_store_sell_out_day"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_sellout_target_day"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-mdm-channel-item",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-full-dw1-biz-item-substitute-all",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_channel_item"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_dim_channel_item"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-mdm-item-substitute",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-full-dw1-biz-location-network",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_item_substitute"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_dim_item_substitute"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-mdm-warehouse",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-full-dw1-biz-new-launch",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_warehouse"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_dim_warehouse"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-arp-biz-top-down-date-item-location",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "full-dw1-biz-target-brand-store-sell-out-day",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "arp_biz_top_down_date_item_location"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_top_down_date_item_location"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-dw1-udt-bulk-sales-and-plan",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-full-dw1-biz-store-item",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_udt_bulk_sales_and_plan"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_udt_bulk_sales_and_plan"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-full-arp-biz-top-down-location-item",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-full-dw1-mdm-channel-item",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "arp_biz_top_down_location_item"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_arp_biz_top_down_location_item"
+								}
+							}
+						]
+					},
+					{
+						"name": "sqoop-import-dw1-biz-replenish-strategy-jd",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-full-dw1-mdm-item-substitute",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_replenish_strategy"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/ods_mysql_biz_replenish_strategy_jd"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm-dpt-dw1-udt-special-stock-plan",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-biz-data-mysql-hive",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "test"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/test"
+								}
+							}
+						]
+					},
+					{
+						"name": "dpt-dw1-biz-store-warehouse-calendar-setting",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm-dpt-dw1-udt-special-stock-plan",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "test"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/test"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm-dpt-dw1-biz-warehouse-calendar",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "dpt-dw1-biz-store-warehouse-calendar-setting",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "test"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/test"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm-dpt-dw1-biz-warehouse-calendar-no-ship",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm-dpt-dw1-biz-warehouse-calendar",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "test"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/test"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm-dpt-dw2-output-allocation-java",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm-dpt-dw1-biz-warehouse-calendar-no-ship",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "test"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/test"
+								}
+							}
+						]
+					},
+					{
+						"name": "import-ldlgtm-dpt-app-replenishment-store-output-adjust",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm-dpt-dw2-output-allocation-java",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "test"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/test"
+								}
+							}
+						]
+					},
+					{
+						"name": "biz-location-warehouse-inventory-allocation-view",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-ldlgtm-dpt-app-replenishment-store-output-adjust",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "test"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_import",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "import/test"
+								}
+							}
+						]
+					},
+					{
+						"name": "end-sync-biz-data-mysql-hive",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "sqoop-import-dw1-biz-replenish-strategy-jd",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "sqoop-import-full-dw1-mdm-warehouse",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "sqoop-import-full-arp-biz-top-down-date-item-location",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "sqoop-import-full-dw1-udt-bulk-sales-and-plan",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "sqoop-import-full-arp-biz-top-down-location-item",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "biz-location-warehouse-inventory-allocation-view",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "css"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "gtm/gtm_comm_data"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-03-16T06:17:06Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_databricks')]",
+				"[concat(variables('factoryId'), '/datasets/gtm_sf_art_mysql_import')]",
+				"[concat(variables('factoryId'), '/datasets/gtm_sf_art_parquet_import')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sync-dw1-data-hive-mysql-full')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "import-item-master-data-common",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "export-full-dws-dim-item-price",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-common",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dw1_mdm_item_price"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dws_dim_item_price"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-dws-dim-item-uom",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-common",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dw1_mdm_item_uom"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dws_dim_item_uom"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-biz-batch-log",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-common",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dw1_biz_batch_log"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "fact_dw1_biz_batch_log"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-brand",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-common",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dw1_mdm_brand"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dws_dim_brand"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-channel",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-common",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dw1_mdm_channel"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dws_dim_channel"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-item",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "import-item-master-data-common",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dw1_mdm_item"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dws_dim_item"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "gtm/gtm_comm_data"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-03-16T06:17:06Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_databricks')]",
+				"[concat(variables('factoryId'), '/datasets/gtm_sf_art_parquet_export')]",
+				"[concat(variables('factoryId'), '/datasets/gtm_sf_art_mysql_export')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sync-dw1-data-hive-mysql')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "start-sync-dw1-data-hive-mysql",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/GTM/GTM_ART_Data/activity/UpReplenishStrategyJob"
+						},
+						"linkedServiceName": {
+							"referenceName": "gtm_sf_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "export-full-dws-dim-store-brand",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_store_brand"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_store_brand"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-biz-location-network",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_biz_location_network"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dws_dim_biz_location_network"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-biz-location-warehouse-store",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_biz_location_warehouse_store"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_location_warehouse_store"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-brand",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_brand"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_brand"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-category",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "export-full-dws-dim-store-brand",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_category"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_category"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-channel",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_channel"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_channel"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-location",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "export-full-fact-dw1-mdm-brand",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_location"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dws_dim_location"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-store",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "export-full-fact-dw1-mdm-category",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_store"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_store"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-warehouse",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "export-full-fact-dw1-mdm-channel",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_warehouse"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_warehouse"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-sum-dw1-biz-warehouse-item",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_biz_warehouse_item"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_warehouse_item"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-calendar",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "export-full-fact-dw1-biz-location-warehouse-store",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_biz_calendar"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_calendar"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-mdm-channel-item-all",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "export-full-sum-dw1-biz-warehouse-item",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_channel_item_all"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_mdm_channel_item_all"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-full-fact-dw1-biz-item-sd-substitute",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "export-full-fact-dw1-mdm-location",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_dim_item_sd_sub"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_item_sd_substitute"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-inc-dw1-biz-location-store-sale-total-day",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_sum_biz_location_store_sale_day"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_location_store_sale_total_day"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-inc-dw1-biz-location-store-sale-total-month",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_sum_biz_location_store_sale_month"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_location_store_sale_total_month"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-inc-dw1-biz-location-store-sale-total-week",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_sum_biz_location_store_sale_week"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_location_store_sale_total_week"
+								}
+							}
+						]
+					},
+					{
+						"name": "dw1-biz-target-brand-store-sell-out-day-system",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_fact_biz_sellout_target_day_system"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_target_brand_store_sell_out_day_system"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-inc-dw1-odp-demand-forecast-month-horizontal",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_fact_demand_forecast_month_horizontal"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_odp_demand_forecast_month_horizontal"
+								}
+							}
+						]
+					},
+					{
+						"name": "export-inc-dw1-biz-location-store-item-sale-total-month",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "start-sync-dw1-data-hive-mysql",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "gtm_sf_art_parquet_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "export/dws_sum_biz_store_item_sale_month"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gtm_sf_art_mysql_export",
+								"type": "DatasetReference",
+								"parameters": {
+									"mysql_table_name": "dw1_biz_location_store_item_sale_total_month"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "gtm/gtm_ldpos"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-03-17T03:48:50Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_databricks')]",
+				"[concat(variables('factoryId'), '/datasets/gtm_sf_art_parquet_export')]",
+				"[concat(variables('factoryId'), '/datasets/gtm_sf_art_mysql_export')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_art_detla_lake_export')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricksDeltaLake1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"delta_table_name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureDatabricksDeltaLakeDataset",
+				"typeProperties": {
+					"database": "gtmart",
+					"table": {
+						"value": "@dataset().delta_table_name",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricksDeltaLake1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_art_detla_lake_import')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricksDeltaLake1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"delta_table_name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureDatabricksDeltaLakeDataset",
+				"typeProperties": {
+					"database": "gtmart",
+					"table": {
+						"value": "@dataset().delta_table_name",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricksDeltaLake1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_art_mysql_export')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_sdt_mysql",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"mysql_table_name": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureMySqlTable",
+				"schema": [],
+				"typeProperties": {
+					"tableName": {
+						"value": "@dataset().mysql_table_name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_sdt_mysql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_art_mysql_import')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_sdt_mysql",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"mysql_table_name": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureMySqlTable",
+				"schema": [],
+				"typeProperties": {
+					"tableName": {
+						"value": "@dataset().mysql_table_name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_sdt_mysql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_art_parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_parquet",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"file_path": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().file_path",
+							"type": "Expression"
+						},
+						"fileSystem": "gtmart"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_art_parquet_export')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_parquet",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"file_path": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().file_path",
+							"type": "Expression"
+						},
+						"fileSystem": "gtmart"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_art_parquet_import')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "gtm_sf_parquet",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"file_path": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().file_path",
+							"type": "Expression"
+						},
+						"fileSystem": "gtmart"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gtm_sf_parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricksDeltaLake1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricksDeltaLake",
+				"typeProperties": {
+					"domain": "https://adb-7433700282707568.0.databricks.azure.cn",
+					"clusterId": "0209-074441-pnq4q759",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDatabricksDeltaLake1_accessToken')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "air-odp01",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/air-odp01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_art_mysql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureMySql",
+				"typeProperties": {
+					"connectionString": "[parameters('gtm_sf_art_mysql_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "air-odp01",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/air-odp01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_databricks')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-7433700282707568.0.databricks.azure.cn",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/32127055-52b4-4e2d-a5da-8d86ebf8ada2/resourceGroups/ce2-cndat-rg-np-odp09/providers/Microsoft.Databricks/workspaces/ce2-cndat-dbr-np-odp07",
+					"existingClusterId": "[parameters('gtm_sf_databricks_properties_typeProperties_existingClusterId')]"
+				},
+				"connectVia": {
+					"referenceName": "air-odp01",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/air-odp01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_dst_mysql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureMySql",
+				"typeProperties": {
+					"connectionString": "[parameters('gtm_sf_dst_mysql_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "air-odp01",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/air-odp01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_parquet')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('gtm_sf_parquet_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "air-odp01",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/air-odp01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gtm_sf_sdt_mysql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureMySql",
+				"typeProperties": {
+					"connectionString": "[parameters('gtm_sf_sdt_mysql_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "air-odp01",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/air-odp01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/air-odp01')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "chinaeast2",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false
+						},
+						"pipelineExternalComputeScaleProperties": {
+							"timeToLive": 60
+						}
+					}
+				},
+				"managedVirtualNetwork": {
+					"type": "ManagedVirtualNetworkReference",
+					"referenceName": "default"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sir-odp01')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {
+					"linkedInfo": {
+						"resourceId": "[parameters('sir-odp01_properties_typeProperties_linkedInfo_resourceId')]",
+						"authorizationType": "Rbac"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/pe-core-adls')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('pe-core-adls_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('pe-core-adls_properties_groupId')]",
+				"fqdns": "[parameters('pe-core-adls_properties_fqdns')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/pe-ri-adls')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('pe-ri-adls_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('pe-ri-adls_properties_groupId')]",
+				"fqdns": "[parameters('pe-ri-adls_properties_fqdns')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		}
+	]
+}
