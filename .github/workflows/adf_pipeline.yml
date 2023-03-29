@@ -28,7 +28,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Deploy to Azure ADF
-      uses: miyas000/pipeline_demo@main
+      uses: pipeline_demo@main
       with:
         resource-group: ce2-cndat-rg-np-odp09
         data-factory-name:  ce2-cndat-df-np-odp07
