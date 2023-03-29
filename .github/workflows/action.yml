@@ -1,0 +1,33 @@
+name: Azure Data Factory CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Get ADF credentials
+        uses: bubbagrumpy/az-adf-auth@v1
+        id: get_creds
+        with:
+          subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+          resourceGroup: ${{ secrets.RESOURCE_GROUP }}
+          factory: ${{ secrets.DATA_FACTORY_NAME }}
+          
+      - name: Publish code to ADF
+        uses: Changsensen7/pipeline_demo@main
+        with:
+          ADF_NAME: ${{ secrets.DATA_FACTORY_NAME }}
+          ADF_CLIENT_ID: ${{ steps.get_creds.outputs.clientId }}
+          ADF_CLIENT_SECRET: ${{ steps.get_creds.outputs.clientSecret }}
+          ADF_TENANT_ID: ${{ steps.get_creds.outputs.tenantId }}
