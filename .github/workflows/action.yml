@@ -15,6 +15,9 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+      - name : print test 
+        run: echo ${{  secrets.AZURE_CREDENTIALS }}
           
       - name: Get ADF credentials
         uses: bubbagrumpy/az-adf-auth@v1
