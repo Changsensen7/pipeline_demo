@@ -20,7 +20,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        #pip install -r requirements.txt
       
     - name: Authenticate with Azure
       uses: azure/login@v1
@@ -32,6 +32,6 @@ jobs:
       with:
         resource-group: my-resource-group
         data-factory-name: my-data-factory
-        git-repo-url: https://github.com/username/repository-name.git
+        git-repo-url: https://github.com/Changsensen7/pipeline_demo.git
       env:
         azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
