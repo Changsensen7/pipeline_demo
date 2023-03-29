@@ -28,10 +28,10 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Deploy to Azure ADF
-      uses: miyas000/azure-adf-deploy@main
+      uses: miyas000/pipeline_demo@main
       with:
-        resource-group: my-resource-group
-        data-factory-name: my-data-factory
+        resource-group: ce2-cndat-rg-np-odp09
+        data-factory-name:  ce2-cndat-df-np-odp07
         git-repo-url: https://github.com/Changsensen7/pipeline_demo.git
       env:
         azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
